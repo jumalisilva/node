@@ -29,4 +29,3 @@ postTabela.sync({force: true})
 })
 
 */
-

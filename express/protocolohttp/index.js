@@ -13,7 +13,10 @@ const bodyParser = require('body-parser');
 const Post = require('./post');
 
 // Configurando o handlebars e o template engine
-app.engine('handlebars', handlebars.engine({defaultLayout: 'main'}));
+app.engine('handlebars', handlebars.engine({defaultLayout: 'main', runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+}}));
 app.set('view.engine', 'handlebars');
 
 // Configurando a body-parser
@@ -25,6 +28,13 @@ app.get('/cad', function(req, res){
     res.render('formulario.handlebars');
 });
 
+// Rota para a Home
+app.get('/', function(req, res){
+    Post.findAll({order: [['id', 'DESC']]}).then(function(posts){
+    res.render('home.handlebars', {posts: posts})
+});  
+});
+
 // Uma nova rota post
 app.post('/add', function(req, res){
     Post.create({
@@ -32,7 +42,7 @@ app.post('/add', function(req, res){
         conteudo: req.body.conteudo
     })
     .then(function(){
-        res.send("Post criado com sucesso!")
+        res.redirect('/')
     })
     .catch(function(erro){
         res.send("Houve um erro: " + erro)
@@ -43,27 +53,3 @@ app.post('/add', function(req, res){
 app.listen(8081, function(){
     console.log("O servidor está rodando no endereço http://localhost:8081");
 });
-
-/*
-// Rota chamando o html
-app.get("/", function(req, res){
-    res.sendFile(__dirname + "/html/index.html");
-});
-
-// Rota 2 chamando o html - Sobre
-app.get("/sobre", function(req, res){
-    res.sendFile(__dirname + "/html/sobre.html");
-});
-
-// Rota 3
-app.get("/produtos", function(req, res){
-    res.send("Confira os nossos produtos");
-});
-
-// Rota com parâmetros
-app.get("/ola/:nome/:cargo/:idade", function(req, res){
-    res.send("<h1>Ola " + req.params.nome + "</h1>" +
-    "<br><h2> Seu cargo é: " + req.params.cargo +
-    "<br> Sua idade é: " + req.params.idade + "</h2>"
-);
-}); */
